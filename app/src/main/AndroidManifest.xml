@@ -28,6 +28,14 @@
             android:parentActivityName=".LogInActivity">
 
         </activity>
+        <activity android:name=".AddingPostActivity"
+            android:parentActivityName=".UserPanelActivity">
+
+        </activity>
+        <activity android:name=".EditPostActivity"
+            android:parentActivityName=".UserPanelActivity">
+
+        </activity>
     </application>
 
 </manifest>

@@ -40,6 +40,6 @@
         android:layout_gravity="center"
         android:layout_margin="25dp"
         android:background="@drawable/buttonshape"
-        android:text="@string/submitSignUpButton"
+        android:text="@string/submitBtn"
         android:onClick="submitSignUp"/>
 </LinearLayout>

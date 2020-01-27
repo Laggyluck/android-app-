@@ -1,17 +1,14 @@
 package com.example.apicallsapp;
 
 import android.content.Context;
-import android.os.Build;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
-import androidx.annotation.DrawableRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
@@ -23,20 +20,28 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Locale;
 
 public class UserPanelActivity extends AppCompatActivity {
     String key;
     ApiCall apiCall;
     String sNoPosts = "U have no posts yet.";
-    String author, content, date;
+    String author, content, date, time, realPostId;
     JSONArray jsonArrayResponse;
     Context context;
     String sEdit = "Edit";
     LinearLayout linearLayout;
+    Date dDate;
 
     public void addPost(View view) {
-
+        Intent intent = new Intent(context, AddingPostActivity.class);
+        intent.putExtra("key", key);
+        startActivity(intent);
     }
 
     // Showing text view that there are no posts
@@ -53,7 +58,7 @@ public class UserPanelActivity extends AppCompatActivity {
     }
 
     // TODO: making it with real id of posts
-    private void createPost(String author, String content, String date, int id) {
+    private void createPost(String author, final String content, String date, String time, int id, final String realPostId) {
         int layoutId = id;
         int btnId = id + 1000;
         int postInfoId = id + 2000;
@@ -83,6 +88,16 @@ public class UserPanelActivity extends AppCompatActivity {
         button.setText(sEdit);
         button.setTextSize(12);
         button.setId(btnId);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, EditPostActivity.class);
+                intent.putExtra("_id", realPostId);
+                intent.putExtra("content", content);
+                intent.putExtra("key", key);
+                startActivity(intent);
+            }
+        });
         button.setLayoutParams(btnParams);
         // Setting up author text view
         ConstraintLayout.LayoutParams postInfoParams = new ConstraintLayout.LayoutParams(
@@ -95,6 +110,8 @@ public class UserPanelActivity extends AppCompatActivity {
         postInfoTV.append(author);
         postInfoTV.append("\n");
         postInfoTV.append(date);
+        postInfoTV.append("\n");
+        postInfoTV.append(time);
         // Setting up content text view
         ConstraintLayout.LayoutParams contentParams = new ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
@@ -102,6 +119,8 @@ public class UserPanelActivity extends AppCompatActivity {
         );
         contentParams.setMargins(60,15,0,0);
         contentTV.setText(content);
+        contentTV.setTextSize(18);
+        contentTV.setTextColor(Color.BLACK);
         contentTV.setId(contentId);
         contentTV.setLayoutParams(contentParams);
         // Setting up elements to layout
@@ -122,22 +141,60 @@ public class UserPanelActivity extends AppCompatActivity {
     }
 
     private void dataDisplay(JSONArray data) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.GERMANY);
+        Date[] dates = new Date[data.length()];
+        int counter=0;
+
+
+        for (int j=0; j<data.length(); j++) {
+            try {
+                JSONObject jsonObject = data.getJSONObject(j);
+                dates[j] = format.parse((jsonObject.getString("date")).substring(0, 16));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+                setNoPosts();
+            }
+        }
         try {
-            for (int i=0; i<data.length(); i++) {
-                JSONObject post = data.getJSONObject(i);
-                author = post.getString("author");
-                content = post.getString("content");
-                date = post.getString("date").substring(0, 10);
-                createPost(author, content, date, i);
+            Arrays.sort(dates, Collections.<Date>reverseOrder());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // TODO COMMENT ALL THIS SHIT WITH SHOWING REVERSED POSTS
+        try {
+            while (counter<data.length()) {
+                for (int i = 0; i < data.length(); i++) {
+                    if (counter == data.length()) break;
+                    JSONObject post = data.getJSONObject(i);
+
+                    author = post.getString("author");
+                    content = post.getString("content");
+                    realPostId = post.getString("_id");
+
+                    date = post.getString("date").substring(0, 10);
+                    time = post.getString("date").substring(11, 16);
+
+                    String dateTime = post.getString("date").substring(0, 16);
+                    dDate = format.parse(dateTime);
+
+                    if (dates[counter].equals(dDate)) {
+                        createPost(author, content, date, time, i, realPostId);
+                        counter++;
+                    }
+                }
             }
         } catch (NullPointerException e) {
             // TODO: display there are no posts
             e.printStackTrace();
             setNoPosts();
-//            noPosts.setText(sNoPosts);
-//            noPosts.setVisibility(View.VISIBLE);
         }
         catch (org.json.JSONException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
             e.printStackTrace();
         }
     }
@@ -163,10 +220,7 @@ public class UserPanelActivity extends AppCompatActivity {
             public void onSuccess(JSONArray result) {
                 jsonArrayResponse = result;
                 dataDisplay(jsonArrayResponse);
-                Log.i("dsa", String.valueOf(result.length()));
                 if (result.length() == 0) {
-//                    noPosts.setText(sNoPosts);
-//                    noPosts.setVisibility(View.VISIBLE);
                     setNoPosts();
                 }
             }

@@ -126,4 +126,69 @@ public class ApiCall {
         };
         requestQueue.add(jsonArrayRequest);
     }
+
+    // POST request (posting post)
+    public void postPostReq(final String key, final  ServerCallback callback, JSONObject requestBody) {
+        url = "http://51.178.50.253/posts/";
+        requestQueue = Volley.newRequestQueue(context);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+                url,
+                requestBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        callback.onSuccess(response);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //TODO: handle exceptions
+                    }
+                })
+        {
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Conent-Type", "application/json");
+                headers.put("Authorization", "Bearer " + key);
+                return headers;
+            }
+        };
+
+        requestQueue.add(jsonObjectRequest);
+    }
+
+    // PATCH request (editing post)
+    public void editPost(final String key, String id, JSONObject newContent, final ServerCallback callback) {
+        url = "http://51.178.50.253/posts/" + id;
+        requestQueue = Volley.newRequestQueue(context);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PATCH,
+                url,
+                newContent,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        callback.onSuccess(response);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                })
+        {
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Conent-Type", "application/json");
+                headers.put("Authorization", "Bearer " + key);
+                return headers;
+            }
+        };
+        requestQueue.add(jsonObjectRequest);
+    }
 }

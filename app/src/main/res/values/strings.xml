@@ -2,11 +2,12 @@
     <string name="app_name">api calls app</string>
     <string name="logInButton">LOGIN</string>
     <string name="signUpButton">SIGN UP</string>
-    <string name="submitSignUpButton">SUBMIT</string>
+    <string name="submitBtn">SUBMIT</string>
     <string name="usernameHint">Username</string>
     <string name="passwordHint">Password</string>
     <string name="emailHint">E-mail</string>
     <string name="userPosts">Your posts:</string>
     <string name="addPostButton">Add Post</string>
     <string name="editPostButton">Edit</string>
+    <string name="addPostHint">Type here...</string>
 </resources>

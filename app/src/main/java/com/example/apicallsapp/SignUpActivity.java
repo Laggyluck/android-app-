@@ -15,7 +15,6 @@ import org.json.JSONObject;
 
 public class SignUpActivity extends AppCompatActivity {
     EditText usernameET, passwordET, emailET;
-    String url;
     JSONObject reqBody;
 
     public void submitSignUp (View view) {
@@ -24,7 +23,6 @@ public class SignUpActivity extends AppCompatActivity {
             reqBody.put("userName", usernameET.getText().toString());
             reqBody.put("userPassword", passwordET.getText().toString());
             reqBody.put("userEmail", emailET.getText().toString());
-            Log.i("Json: ", reqBody.toString());
         } catch (Error error) {
             error.printStackTrace();
         } catch (JSONException error) {
