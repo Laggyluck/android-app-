@@ -32,13 +32,12 @@ import java.util.Date;
 import java.util.Locale;
 
 public class UserPanelActivity extends AppCompatActivity {
-    String key;
     ApiCall apiCall;
     String sNoPosts = "U have no posts yet.";
-    String author, content, date, time, realPostId;
+    String sEdit = "Edit";
+    String author, content, date, time, realPostId, key;
     JSONArray jsonArrayResponse;
     Context context;
-    String sEdit = "Edit";
     LinearLayout linearLayout;
     Date dDate;
     Boolean clicked;
