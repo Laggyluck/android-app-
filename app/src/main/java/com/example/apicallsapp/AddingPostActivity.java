@@ -1,15 +1,14 @@
 package com.example.apicallsapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.apicallsapp.R;
 import com.example.apicallsapp.classes.ApiCall;
 import com.example.apicallsapp.interfaces.ServerCallback;
 
@@ -21,17 +20,18 @@ public class AddingPostActivity extends AppCompatActivity {
     ApiCall apiCall;
     EditText content;
     JSONObject reqBody;
+    Context context;
 
     public void sendPost(View view) {
         try {
             reqBody.put("content", content.getText().toString());
-            apiCall = new ApiCall(getApplicationContext());
+            apiCall = new ApiCall(context);
             apiCall.postPostReq(key,
                     new ServerCallback() {
                         @Override
                         public void onSuccess(JSONObject result) {
-                            Toast.makeText(getApplicationContext(), "Added post.", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(getApplicationContext(), UserPanelActivity.class);
+                            Toast.makeText(context, "Added post.", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(context, UserPanelActivity.class);
                             intent.putExtra("key", key);
                             startActivity(intent);
                         }
@@ -52,12 +52,13 @@ public class AddingPostActivity extends AppCompatActivity {
         setContentView(R.layout.activity_adding_post);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        // TODO: make coming back to parent trigger onCreate function
 
         key = getIntent().getStringExtra("key");
 
         content = findViewById(R.id.contentET);
 
         reqBody = new JSONObject();
+
+        context = getApplicationContext();
     }
 }

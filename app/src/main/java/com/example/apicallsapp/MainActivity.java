@@ -9,6 +9,7 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
     Button loginButton, signupButton;
+    // TODO: Clean up spaghetti code
 
     public void changeLayoutSignup(View view) {
         Intent intent = new Intent(getApplicationContext(), SignUpActivity.class);

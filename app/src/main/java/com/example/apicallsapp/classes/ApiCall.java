@@ -1,11 +1,9 @@
 package com.example.apicallsapp.classes;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -13,22 +11,18 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.apicallsapp.LogInActivity;
 import com.example.apicallsapp.interfaces.ServerCallback;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static androidx.core.content.ContextCompat.startActivity;
-
 public class ApiCall {
     private static RequestQueue requestQueue;
     private Context context;
-    String url;
+    private String url;
 
     public ApiCall(Context context) {
         this.context = context;
@@ -46,9 +40,8 @@ public class ApiCall {
                     @Override
                     public void onResponse(JSONObject response) {
                         Toast.makeText(context,
-                                "Succesfully registered!",
+                                "Successfully registered!",
                                 Toast.LENGTH_SHORT).show();
-                        Log.i("Response code: ", String.valueOf(response));
                     }
                 },
                 new Response.ErrorListener() {
@@ -59,6 +52,8 @@ public class ApiCall {
                             Toast.makeText(context,
                                     "Such user already exists.",
                                     Toast.LENGTH_LONG).show();
+                            // TODO: check if it already works
+                            //  (updated server but it needs some time i guess)
                         }
                         if (error.networkResponse.statusCode == 500) {
                             Toast.makeText(context,
@@ -119,7 +114,7 @@ public class ApiCall {
             @Override
             public Map<String, String> getHeaders() {
                 HashMap<String, String> headers = new HashMap<>();
-                headers.put("Conent-Type", "application/json");
+                headers.put("Content-Type", "application/json");
                 headers.put("Authorization", "Bearer " + key);
                 return headers;
             }
@@ -144,19 +139,20 @@ public class ApiCall {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        //TODO: handle exceptions
+                        if (error.networkResponse.statusCode == 500) Toast.makeText(context,
+                                "Nothing to post.", Toast.LENGTH_SHORT).show();
+                        error.printStackTrace();
                     }
                 })
         {
             @Override
             public Map<String, String> getHeaders() {
                 HashMap<String, String> headers = new HashMap<>();
-                headers.put("Conent-Type", "application/json");
+                headers.put("Content-Type", "application/json");
                 headers.put("Authorization", "Bearer " + key);
                 return headers;
             }
         };
-
         requestQueue.add(jsonObjectRequest);
     }
 
@@ -184,7 +180,7 @@ public class ApiCall {
             @Override
             public Map<String, String> getHeaders() {
                 HashMap<String, String> headers = new HashMap<>();
-                headers.put("Conent-Type", "application/json");
+                headers.put("Content-Type", "application/json");
                 headers.put("Authorization", "Bearer " + key);
                 return headers;
             }
@@ -216,12 +212,11 @@ public class ApiCall {
             @Override
             public Map<String, String> getHeaders() {
                 HashMap<String, String> headers = new HashMap<>();
-                headers.put("Conent-Type", "application/json");
+                headers.put("Content-Type", "application/json");
                 headers.put("Authorization", "Bearer " + key);
                 return headers;
             }
         };
-
         requestQueue.add(jsonObjectRequest);
     }
 }

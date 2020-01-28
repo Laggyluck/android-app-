@@ -60,35 +60,8 @@ public class EditPostActivity extends AppCompatActivity {
                 })
                 .create()
                 .show();
-
-//        AlertDialog dialog = builder.create();
-//        dialog.show();
-
-//        new AlertDialog.Builder(context)
-//                .setTitle("Delete")
-//                .setMessage("Do you really want to delete this post?")
-//                .setIcon(android.R.drawable.ic_dialog_alert)
-//                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-//
-//                    public void onClick(DialogInterface dialog, int whichButton) {
-//                        apiCall.delPost(key, postId, new ServerCallback() {
-//                            @Override
-//                            public void onSuccess(JSONObject result) {
-//                                Toast.makeText(context, "Post deleted.", Toast.LENGTH_SHORT).show();
-//                                Intent intent = new Intent(context, UserPanelActivity.class);
-//                                intent.putExtra("key", key);
-//                                startActivity(intent);
-//                            }
-//
-//                            @Override
-//                            public void onSuccess(JSONArray result) {
-//
-//                            }
-//                        });
-//                    }})
-//                .setNegativeButton(android.R.string.no, null).show();
-
     }
+
 
     public void sendPatch(View view) {
         apiCall = new ApiCall(context);
@@ -120,10 +93,10 @@ public class EditPostActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editing_post);
+
         context = getApplicationContext();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        // TODO: make coming back to parent trigger onCreate function
 
         postId = getIntent().getStringExtra("_id");
         sContent = getIntent().getStringExtra("content");

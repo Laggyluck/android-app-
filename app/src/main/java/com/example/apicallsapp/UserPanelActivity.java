@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -40,6 +41,7 @@ public class UserPanelActivity extends AppCompatActivity {
     String sEdit = "Edit";
     LinearLayout linearLayout;
     Date dDate;
+    Boolean clicked;
 
     public void addPost(View view) {
         Intent intent = new Intent(context, AddingPostActivity.class);
@@ -47,7 +49,7 @@ public class UserPanelActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    // Showing text view that there are no posts
+    // Showing TextView that there are no posts
     private void setNoPosts() {
         TextView noPostsTV = new TextView(context);
         ConstraintLayout.LayoutParams noPostsParams = new ConstraintLayout.LayoutParams(
@@ -60,41 +62,26 @@ public class UserPanelActivity extends AppCompatActivity {
         linearLayout.addView(noPostsTV);
     }
 
-    // Deleting post
-    public void delPost(String key, String postId) {
-        apiCall = new ApiCall(context);
-        apiCall.delPost(key, postId, new ServerCallback() {
-            @Override
-            public void onSuccess(JSONObject result) {
-                Toast.makeText(context, "Post deleted.", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onSuccess(JSONArray result) {
-
-            }
-        });
-    }
-
-
+    // Creating post
     private void createPost(String author, final String content, String date, String time, int id, final String realPostId) {
         int layoutId = id;
         int btnId = id + 1000;
         int postInfoId = id + 2000;
         int contentId = id + 3000;
 
-        ConstraintLayout layout = new ConstraintLayout(context);
+        final ConstraintLayout layout = new ConstraintLayout(context);
         Button button = new Button(context);
         TextView postInfoTV = new TextView(context);
         TextView contentTV = new TextView(context);
         ConstraintSet constraintSet = new ConstraintSet();
 
         // Setting up layout:
-        ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(
+        final ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.MATCH_PARENT,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT);
         layoutParams.setMargins(0, 15, 0, 30);
         layout.setMaxHeight(400);
+        layout.setPadding(0,0,35,0);
         layout.setLayoutParams(layoutParams);
         layout.setId(layoutId);
 
@@ -146,6 +133,20 @@ public class UserPanelActivity extends AppCompatActivity {
         contentTV.setTextSize(18);
         contentTV.setTextColor(Color.BLACK);
         contentTV.setId(contentId);
+        contentTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!clicked){
+                    // Note that it is not a perfect solution. It works here for now but it should
+                    // wrap content on click
+                    layout.setMaxHeight(5000);
+                    clicked = true;
+                } else {
+                    layout.setMaxHeight(400);
+                    clicked = false;
+                }
+            }
+        });
         contentTV.setLayoutParams(contentParams);
 
         // Setting up elements to layout
@@ -171,7 +172,7 @@ public class UserPanelActivity extends AppCompatActivity {
         Date[] dates = new Date[data.length()];
         int counter=0;
 
-
+        // Putting all dates of posts into dates table
         for (int j=0; j<data.length(); j++) {
             try {
                 JSONObject jsonObject = data.getJSONObject(j);
@@ -185,29 +186,37 @@ public class UserPanelActivity extends AppCompatActivity {
                 setNoPosts();
             }
         }
+
+        // Sorting dates in reverse order so we can see posts from latest to oldest
         try {
             Arrays.sort(dates, Collections.<Date>reverseOrder());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // TODO COMMENT ALL THIS SHIT WITH SHOWING REVERSED POSTS
+
         try {
+            // WHILE LOOP: this loop makes sure we display we've got all posts
             while (counter<data.length()) {
+                // FOR LOOP: this loop is to iterate through all posts we've got to find one with
+                // correct date - if we find one then we display it
+                // and go to find next post with correct date
                 for (int i = 0; i < data.length(); i++) {
                     if (counter == data.length()) break;
                     JSONObject post = data.getJSONObject(i);
 
-                    author = post.getString("author");
-                    content = post.getString("content");
-                    realPostId = post.getString("_id");
-
-                    date = post.getString("date").substring(0, 10);
-                    time = post.getString("date").substring(11, 16);
-
                     String dateTime = post.getString("date").substring(0, 16);
                     dDate = format.parse(dateTime);
-
+                    // Here we check if actual date we want to display matches with date of
+                    // current object we check by our for loop
                     if (dates[counter].equals(dDate)) {
+
+                        author = post.getString("author");
+                        content = post.getString("content");
+                        realPostId = post.getString("_id");
+
+                        date = post.getString("date").substring(0, 10);
+                        time = post.getString("date").substring(11, 16);
+
                         createPost(author, content, date, time, i, realPostId);
                         counter++;
                     }
@@ -235,9 +244,9 @@ public class UserPanelActivity extends AppCompatActivity {
 
         context = getApplicationContext();
 
-        // Getting key value
+        clicked = false;
+
         key = getIntent().getStringExtra("key");
-        // TODO: make user panel: operations on posts (show, add, delete, patch)
 
         apiCall = new ApiCall(getApplicationContext());
         apiCall.getPostsReq(key, new ServerCallback() {
