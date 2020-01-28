@@ -1,14 +1,15 @@
 package com.example.apicallsapp;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.apicallsapp.classes.ApiCall;
@@ -24,9 +25,73 @@ public class EditPostActivity extends AppCompatActivity {
     EditText patchContent;
     ApiCall apiCall;
     JSONObject newContent;
+    Context context;
+
+    public void delPost(View view) {
+        apiCall = new ApiCall(getApplicationContext());
+
+        new AlertDialog.Builder(this)
+                .setMessage(R.string.alertDialogMsg)
+                .setTitle(R.string.alertDialogTitle)
+                .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        apiCall.delPost(key, postId, new ServerCallback() {
+                            @Override
+                            public void onSuccess(JSONObject result) {
+                                Toast.makeText(context, "Post deleted.", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(context, UserPanelActivity.class);
+                                intent.putExtra("key", key);
+                                startActivity(intent);
+                            }
+
+                            @Override
+                            public void onSuccess(JSONArray result) {
+
+                            }
+                        });
+                    }
+                })
+                .setNegativeButton(R.string.back, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .create()
+                .show();
+
+//        AlertDialog dialog = builder.create();
+//        dialog.show();
+
+//        new AlertDialog.Builder(context)
+//                .setTitle("Delete")
+//                .setMessage("Do you really want to delete this post?")
+//                .setIcon(android.R.drawable.ic_dialog_alert)
+//                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+//
+//                    public void onClick(DialogInterface dialog, int whichButton) {
+//                        apiCall.delPost(key, postId, new ServerCallback() {
+//                            @Override
+//                            public void onSuccess(JSONObject result) {
+//                                Toast.makeText(context, "Post deleted.", Toast.LENGTH_SHORT).show();
+//                                Intent intent = new Intent(context, UserPanelActivity.class);
+//                                intent.putExtra("key", key);
+//                                startActivity(intent);
+//                            }
+//
+//                            @Override
+//                            public void onSuccess(JSONArray result) {
+//
+//                            }
+//                        });
+//                    }})
+//                .setNegativeButton(android.R.string.no, null).show();
+
+    }
 
     public void sendPatch(View view) {
-        apiCall = new ApiCall(getApplicationContext());
+        apiCall = new ApiCall(context);
 
         newContent = new JSONObject();
         try {
@@ -39,7 +104,7 @@ public class EditPostActivity extends AppCompatActivity {
             @Override
             public void onSuccess(JSONObject result) {
                 Toast.makeText(getApplicationContext(), "Updated post.", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getApplicationContext(), UserPanelActivity.class);
+                Intent intent = new Intent(context, UserPanelActivity.class);
                 intent.putExtra("key", key);
                 startActivity(intent);
             }
@@ -55,6 +120,10 @@ public class EditPostActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editing_post);
+        context = getApplicationContext();
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        // TODO: make coming back to parent trigger onCreate function
 
         postId = getIntent().getStringExtra("_id");
         sContent = getIntent().getStringExtra("content");

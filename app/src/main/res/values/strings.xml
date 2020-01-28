@@ -10,4 +10,8 @@
     <string name="addPostButton">Add Post</string>
     <string name="editPostButton">Edit</string>
     <string name="addPostHint">Type here...</string>
+    <string name="alertDialogMsg">After you delete this post you will not be able see this post anymore.</string>
+    <string name="alertDialogTitle">Are you sure you want to delete this post?</string>
+    <string name="delete">Delete</string>
+    <string name="back">Back</string>
 </resources>

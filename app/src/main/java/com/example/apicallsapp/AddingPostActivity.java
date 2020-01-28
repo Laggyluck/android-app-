@@ -44,8 +44,6 @@ public class AddingPostActivity extends AppCompatActivity {
         } catch (org.json.JSONException e) {
             e.printStackTrace();
         }
-
-        //TODO: after sending post go back to user panel
     }
 
     @Override
@@ -54,6 +52,7 @@ public class AddingPostActivity extends AppCompatActivity {
         setContentView(R.layout.activity_adding_post);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        // TODO: make coming back to parent trigger onCreate function
 
         key = getIntent().getStringExtra("key");
 

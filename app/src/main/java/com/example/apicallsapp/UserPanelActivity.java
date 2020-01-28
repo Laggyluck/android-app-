@@ -1,6 +1,7 @@
 package com.example.apicallsapp;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -8,7 +9,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
@@ -57,7 +60,23 @@ public class UserPanelActivity extends AppCompatActivity {
         linearLayout.addView(noPostsTV);
     }
 
-    // TODO: making it with real id of posts
+    // Deleting post
+    public void delPost(String key, String postId) {
+        apiCall = new ApiCall(context);
+        apiCall.delPost(key, postId, new ServerCallback() {
+            @Override
+            public void onSuccess(JSONObject result) {
+                Toast.makeText(context, "Post deleted.", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSuccess(JSONArray result) {
+
+            }
+        });
+    }
+
+
     private void createPost(String author, final String content, String date, String time, int id, final String realPostId) {
         int layoutId = id;
         int btnId = id + 1000;
@@ -69,21 +88,24 @@ public class UserPanelActivity extends AppCompatActivity {
         TextView postInfoTV = new TextView(context);
         TextView contentTV = new TextView(context);
         ConstraintSet constraintSet = new ConstraintSet();
+
         // Setting up layout:
         ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.MATCH_PARENT,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams.setMargins(0, 0, 0, 30);
+        layoutParams.setMargins(0, 15, 0, 30);
+        layout.setMaxHeight(400);
         layout.setLayoutParams(layoutParams);
         layout.setId(layoutId);
-        // Setting up button:
+
+        // Setting up edit button:
         ConstraintLayout.LayoutParams btnParams = new ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT
         );
-        button.setBackgroundResource(R.drawable.buttonshape);
+        button.setBackgroundResource(R.drawable.smallbuttonshape);
         btnParams.width = 100;
-        btnParams.height = 100;
+        btnParams.height = 90;
         btnParams.setMargins(5,5,0,0);
         button.setText(sEdit);
         button.setTextSize(12);
@@ -99,6 +121,7 @@ public class UserPanelActivity extends AppCompatActivity {
             }
         });
         button.setLayoutParams(btnParams);
+
         // Setting up author text view
         ConstraintLayout.LayoutParams postInfoParams = new ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
@@ -112,30 +135,33 @@ public class UserPanelActivity extends AppCompatActivity {
         postInfoTV.append(date);
         postInfoTV.append("\n");
         postInfoTV.append(time);
+
         // Setting up content text view
         ConstraintLayout.LayoutParams contentParams = new ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT
         );
-        contentParams.setMargins(60,15,0,0);
+        contentParams.setMargins(70,15,0,0);
         contentTV.setText(content);
         contentTV.setTextSize(18);
         contentTV.setTextColor(Color.BLACK);
         contentTV.setId(contentId);
         contentTV.setLayoutParams(contentParams);
+
         // Setting up elements to layout
         layout.addView(button);
         layout.addView(postInfoTV);
         layout.addView(contentTV);
         layout.invalidate();
-        // Setting up constraint TODO: attach all by using constraintSet.connect() method
+
+        // Setting up constraint
         constraintSet.clone(layout);
-        constraintSet.connect(btnId, ConstraintSet.START, layoutId, ConstraintSet.START, 0);
-        constraintSet.connect(btnId, ConstraintSet.TOP, layoutId, ConstraintSet.TOP, 0);
-        constraintSet.connect(postInfoId, ConstraintSet.START, layoutId, ConstraintSet.START, 0);
-        constraintSet.connect(postInfoId, ConstraintSet.TOP, btnId, ConstraintSet.BOTTOM, 0);
-        constraintSet.connect(contentId, ConstraintSet.START, postInfoId, ConstraintSet.END, 0);
-        constraintSet.connect(contentId, ConstraintSet.TOP, layoutId, ConstraintSet.TOP, 0);
+        constraintSet.connect(btnId, ConstraintSet.START, layoutId, ConstraintSet.START);
+        constraintSet.connect(btnId, ConstraintSet.TOP, layoutId, ConstraintSet.TOP);
+        constraintSet.connect(postInfoId, ConstraintSet.START, layoutId, ConstraintSet.START);
+        constraintSet.connect(postInfoId, ConstraintSet.TOP, btnId, ConstraintSet.BOTTOM);
+        constraintSet.connect(contentId, ConstraintSet.START, postInfoId, ConstraintSet.END);
+        constraintSet.connect(contentId, ConstraintSet.TOP, layoutId, ConstraintSet.TOP);
         constraintSet.applyTo(layout);
         linearLayout.addView(layout);
     }
@@ -188,7 +214,6 @@ public class UserPanelActivity extends AppCompatActivity {
                 }
             }
         } catch (NullPointerException e) {
-            // TODO: display there are no posts
             e.printStackTrace();
             setNoPosts();
         }
@@ -229,9 +254,5 @@ public class UserPanelActivity extends AppCompatActivity {
 
             }
         });
-            // TODO: Make it clear: constraint layout shouldn't exists by itself - must
-            //  be initialized by onSuccess function (showing all posts). If there are no posts
-            //  it should show textview that says you have no posts or smth
-
     }
 }

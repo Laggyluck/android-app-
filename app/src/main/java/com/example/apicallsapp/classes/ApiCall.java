@@ -177,7 +177,7 @@ public class ApiCall {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-
+                        error.printStackTrace();
                     }
                 })
         {
@@ -189,6 +189,39 @@ public class ApiCall {
                 return headers;
             }
         };
+        requestQueue.add(jsonObjectRequest);
+    }
+
+    // DELETE request (deleting post)
+    public void delPost(final String key, String id, final ServerCallback callback) {
+        url = "http://51.178.50.253/posts/" + id;
+        requestQueue = Volley.newRequestQueue(context);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.DELETE,
+                url,
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        callback.onSuccess(response);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                })
+        {
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Conent-Type", "application/json");
+                headers.put("Authorization", "Bearer " + key);
+                return headers;
+            }
+        };
+
         requestQueue.add(jsonObjectRequest);
     }
 }
